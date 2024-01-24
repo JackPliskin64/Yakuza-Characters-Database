@@ -15,6 +15,8 @@ const pong = (req, res, next) => {
 connectDB()
 //Esta línea permite a mi servidor recibir req.body de formato .json
 app.use(express.json())
+
+app.use('/', characterRoutes)
 app.use('/api/v1/characters', characterRoutes)
 app.use('/ping', pong)
 app.listen(port, () => {
