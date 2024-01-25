@@ -19,6 +19,9 @@ app.use(express.json())
 app.use('/', characterRoutes)
 app.use('/api/v1/characters', characterRoutes)
 app.use('/ping', pong)
+app.use('*', (req, res, next) => {
+  return res.status(404).json('Route not found')
+})
 app.listen(port, () => {
   console.log('http://localhost:' + port)
 })
