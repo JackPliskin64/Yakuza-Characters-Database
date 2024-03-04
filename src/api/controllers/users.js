@@ -27,7 +27,7 @@ const register = async (req, res, next) => {
     const duplicateUser = await buscarUsuario(req.body.userName)
 
     if (duplicateUser) {
-      return res.status(400).json('El nombre de usuario ya está en uso')
+      return res.status(400).json('Busca otro nombre crack')
     }
 
     const userSaved = await newUser.save()
@@ -42,14 +42,14 @@ const login = async (req, res, next) => {
     const user = await buscarUsuario(req.body.userName)
 
     if (!user) {
-      return res.status(400).json('El usuario no existe')
+      return res.status(400).json('Usuario no existente')
     }
 
     if (bcrypt.compareSync(req.body.password, user.password)) {
       const token = generateSign(user._id)
       return res.status(200).json({ user, token })
     } else {
-      return res.status(400).json('La contraseña es incorrecta')
+      return res.status(400).json('La contraseña está mal crack')
     }
   } catch (error) {
     return res.status(400).json(error)
