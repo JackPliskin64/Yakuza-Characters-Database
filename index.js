@@ -1,29 +1,22 @@
-//npm init -y      inicia el package.json
-//Instalo express con     npm i express    y le adjunto la constante app
-//npm i -D nodemon     instala nodemon y añade la dependencia como dev al package.json
 require('dotenv').config()
 const express = require('express')
-const { conectDB, connectDB } = require('./src/config/db')
-const characterRoutes = require('./src/api/routes/character')
-const userRoutes = require('./src/api/routes/users')
+const { connectDB } = require('./src/config/db')
+const cors = require('cors')
 const app = express()
+const mainRouter = require('./src/api/routes/main')
 const port = 3000
-//Request, response, next
-const pong = (req, res, next) => {
-  return res.status(200).json('pong')
-}
-
+//Ejecuto la funcion basica
 connectDB()
 //Esta línea permite a mi servidor recibir req.body de formato .json
 app.use(express.json())
-
-app.use('/', characterRoutes)
-app.use('/api/v1/characters', characterRoutes)
-app.use('/api/v1/users', userRoutes)
-app.use('/ping', pong)
+//Esta linea permite la conexion con el front
+app.use(cors())
+//Establecer las rutas
+app.use('/api/v1', mainRouter)
 app.use('*', (req, res, next) => {
   return res.status(404).json('Route not found')
 })
+//Listener
 app.listen(port, () => {
   console.log('http://localhost:' + port)
 })

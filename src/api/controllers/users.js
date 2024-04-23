@@ -1,11 +1,7 @@
 const { generateSign } = require('../../config/jwt')
+const { buscarUsuario } = require('../../utils/buscarUsuario')
 const User = require('../models/users')
 const bcrypt = require('bcrypt')
-
-const buscarUsuario = async (userName) => {
-  const user = await User.findOne({ userName })
-  return user
-}
 
 const getUsers = async (req, res, next) => {
   try {
