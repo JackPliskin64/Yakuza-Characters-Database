@@ -1,11 +1,7 @@
 const { generateSign } = require('../../config/jwt')
+const { buscarUsuario } = require('../../utils/buscarUsuario')
 const User = require('../models/users')
 const bcrypt = require('bcrypt')
-
-const buscarUsuario = async (userName) => {
-  const user = await User.findOne({ userName })
-  return user
-}
 
 const getUsers = async (req, res, next) => {
   try {
@@ -27,7 +23,7 @@ const register = async (req, res, next) => {
     const duplicateUser = await buscarUsuario(req.body.userName)
 
     if (duplicateUser) {
-      return res.status(400).json('Busca otro nombre crack')
+      return res.status(400).json('Nombre ya en uso')
     }
 
     const userSaved = await newUser.save()
@@ -49,7 +45,7 @@ const login = async (req, res, next) => {
       const token = generateSign(user._id)
       return res.status(200).json({ user, token })
     } else {
-      return res.status(400).json('La contraseña está mal crack')
+      return res.status(400).json('La contraseña es incorrecta')
     }
   } catch (error) {
     return res.status(400).json(error)
