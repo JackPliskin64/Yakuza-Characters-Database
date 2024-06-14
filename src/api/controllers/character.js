@@ -45,6 +45,13 @@ const updateCharacter = async (req, res, next) => {
     const { id } = req.params
     const newCharacter = new Character(req.body)
     newCharacter._id = id
+
+    if (req.file) {
+      newCharacter.imgUrl = req.file.path
+      const oldCharacter = await Character.findById(id)
+      deleteFile(oldCharacter.imgUrl)
+    }
+
     //Me devolverá el dato antiguo pero actualizará al nuevo, por eso añadimos { new: true } para que nos muestre el nuevo
     const characterUpdated = await Character.findByIdAndUpdate(
       id,
