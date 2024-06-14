@@ -4,6 +4,11 @@ const Character = require('../models/character')
 const postCharacter = async (req, res, next) => {
   try {
     const newCharacter = new Character(req.body)
+    if (req.file) {
+      console.log(req.file)
+      newCharacter.imgUrl = req.file.path
+    }
+
     const characterSaved = await newCharacter.save()
     return res.status(201).json(characterSaved)
   } catch (error) {
@@ -57,6 +62,7 @@ const deleteCharacter = async (req, res, next) => {
   try {
     const { id } = req.params
     const characterDeleted = await Character.findByIdAndDelete(id)
+    deleteFile(characterDeleted.imgUrl)
     return res.status(200).json(characterDeleted)
   } catch (error) {
     return res.status(400).json('Error al eliminar personaje')
