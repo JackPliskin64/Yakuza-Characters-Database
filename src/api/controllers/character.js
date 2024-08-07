@@ -7,13 +7,18 @@ const postCharacter = async (req, res, next) => {
     const characterSaved = await newCharacter.save()
     return res.status(201).json(characterSaved)
   } catch (error) {
-    return res.status(400).json('Error al crear el personaje')
+    if (error.code === 11000) {
+      return res.status(409).json('Registro duplicado')
+    } else {
+      return res.status(400).json('Error al crear el personaje')
+    }
   }
 }
 
 //READ
 const getCharacters = async (req, res, next) => {
   try {
+    console.log('GET CHARACTERS')
     //Model.find() - encuentra TODOS los datos de dicha colección
     const allChars = await Character.find()
     return res.status(200).json(allChars)
