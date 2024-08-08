@@ -5,6 +5,14 @@ const cors = require('cors')
 const app = express()
 const mainRouter = require('./src/api/routes/main')
 const port = 3000
+const cloudinary = require('cloudinary').v2
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
+})
+
 //Ejecuto la funcion basica
 connectDB()
 //Esta línea permite a mi servidor recibir req.body de formato .json

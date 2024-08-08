@@ -4,6 +4,11 @@ const Character = require('../models/character')
 const postCharacter = async (req, res, next) => {
   try {
     const newCharacter = new Character(req.body)
+    if (req.file) {
+      console.log(req.file)
+      newCharacter.imgUrl = req.file.path
+    }
+
     const characterSaved = await newCharacter.save()
     return res.status(201).json(characterSaved)
   } catch (error) {
@@ -45,6 +50,13 @@ const updateCharacter = async (req, res, next) => {
     const { id } = req.params
     const newCharacter = new Character(req.body)
     newCharacter._id = id
+
+    if (req.file) {
+      newCharacter.imgUrl = req.file.path
+      const oldCharacter = await Character.findById(id)
+      deleteFile(oldCharacter.imgUrl)
+    }
+
     //Me devolverá el dato antiguo pero actualizará al nuevo, por eso añadimos { new: true } para que nos muestre el nuevo
     const characterUpdated = await Character.findByIdAndUpdate(
       id,
@@ -62,6 +74,7 @@ const deleteCharacter = async (req, res, next) => {
   try {
     const { id } = req.params
     const characterDeleted = await Character.findByIdAndDelete(id)
+    deleteFile(characterDeleted.imgUrl)
     return res.status(200).json(characterDeleted)
   } catch (error) {
     return res.status(400).json('Error al eliminar personaje')

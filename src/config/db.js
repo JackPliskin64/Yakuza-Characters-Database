@@ -2,6 +2,7 @@
 /* npm i dotenv - me permite acceder a las variables de entorno, se suele configurar en la línea 1 del index.js */
 
 const mongoose = require('mongoose')
+const dotenv = require('dotenv')
 
 const connectDB = async () => {
   try {
