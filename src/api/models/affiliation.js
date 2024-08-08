@@ -7,7 +7,7 @@ const affiliationSchema = new mongoose.Schema(
     members: { type: Number, required: true },
     chairman: { type: String, required: true, unique: true },
     headquarters: { type: String, required: true },
-    captains: [{ type: mongoose.Types.ObjectId, ref: 'characters' }]
+    captains: [{ type: mongoose.Types.ObjectId, ref: 'characters', required: false }]
   },
   {
     timestamps: true,

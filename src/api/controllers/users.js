@@ -17,7 +17,7 @@ const register = async (req, res, next) => {
     const newUser = new User({
       userName: req.body.userName,
       password: req.body.password,
-      rol: 'user'
+      role: 'user'
     })
 
     const duplicateUser = await buscarUsuario(req.body.userName)

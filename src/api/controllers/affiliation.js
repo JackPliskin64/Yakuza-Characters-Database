@@ -1,10 +1,11 @@
 const Affiliation = require('../models/affiliation')
+const { deleteFile } = require('../../utils/deleteFile')
 
 //POST
 const postAffiliation = async (req, res, next) => {
   try {
     const newAffiliation = new Affiliation(req.body)
-    console.log(`Lets create a new affiliation with the following information: ${newAffiliation}`)
+    console.log(`Lets create a new affiliation with the following information: ${JSON.stringify(newAffiliation)}`) // JSON.stringify para que se vea bonito
     if (req.file) {
       newAffiliation.imgUrl = req.file.path
       console.log(`Image URL es ${newAffiliation.imgUrl}`)
@@ -42,7 +43,7 @@ const getAffiliationByChairman = async (req, res, next) => {
     console.log(`Lets find affiliation by chairman ${chairman}`)
     const affiliations = await Affiliation.find({ chairman: { $eq: chairman } }).populate({
       path: 'captains',
-      select: 'name imgUrl -_id'
+      select: 'name imgUrl -_id -createdAt -updatedAt -__v'
     })
     if (affiliations.length === 0) {
       console.log('There is no affiliation with that chairman')
@@ -99,22 +100,36 @@ const getAffiliationByMembers = async (req, res, next) => {
 const updateAffiliation = async (req, res, next) => {
   try {
     const { id } = req.params
-    const newAffiliation = new Affiliation(req.body)
-    newAffiliation._id = id
-    console.log(`Lets update affiliation N${id} with the following information: ${newAffiliation}`)
+
+    // Con esta parte aseguramos de actualizar unicamente los campos que se envian en el body
+    const updateFields = {};
+    for (const field of Object.keys(req.body)) {
+      if (req.body[field]) {
+        updateFields[field] = req.body[field]
+      }
+    }
+
+    console.log(`Lets update affiliation N${id} with the following information: ${JSON.stringify(updateFields)}`)
+    updateFields._id = id
     if (req.file) {
-      newAffiliation.imgUrl = req.file.path
+      updateFields.imgUrl = req.file.path
       const oldAffiliation = await Affiliation.findById(id)
       deleteFile(oldAffiliation.imgUrl)
     }
-
     const affiliationUpdated = await Affiliation.findByIdAndUpdate(
       id,
-      newAffiliation,
+      updateFields,
       { new: true }
-    )
-    return res.status(200).json(affiliationUpdated)
+    ).populate('captains', '-createdAt -updatedAt -__v')
+    if (affiliationUpdated.length === 0) {
+      console.log('There is no affiliation with that ID')
+      return res.status(404).json('Not found')
+    } else {
+      console.log(`Affiliation ${affiliationUpdated.name} is updated successfully!`)
+      return res.status(200).json(affiliationUpdated)
+    }
   } catch (error) {
+    console.log(error)
     return res.status(400).json('Error al actualizar afiliación')
   }
 }
@@ -125,9 +140,16 @@ const deleteAffiliation = async (req, res, next) => {
     const { id } = req.params
     console.log(`Lets obliterate affiliation N${id} !!!`)
     const affiliationDeleted = await Affiliation.findByIdAndDelete(id)
-    deleteFile(affiliationDeleted.imgUrl)
+    if (affiliationDeleted === null) {
+      console.log('There is no affiliation with that ID')
+      return res.status(404).json('Not found')
+    } else {
+      deleteFile(affiliationDeleted.imgUrl)
+    }
+    console.log(`Affiliation ${affiliationDeleted.name} is deleted successfully!`)
     return res.status(200).json(affiliationDeleted)
   } catch (error) {
+    console.log(error)
     return res.status(400).json('Error al eliminar afiliación')
   }
 }

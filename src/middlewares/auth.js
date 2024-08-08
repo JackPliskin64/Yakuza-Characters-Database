@@ -27,12 +27,12 @@ const isAdmin = async (req, res, next) => {
 
     const user = await User.findById(id)
 
-    if (user.rol === 'admin') {
+    if (user.role === 'admin') {
       user.password = null
       req.user = user
       next()
     } else {
-      return res.status(400).json('Solo los administadores pueden hacer esto')
+      return res.status(401).json('Solo los administadores pueden hacer esto')
     }
   } catch (error) {
     return res.status(400).json('No estás autorizado')
